@@ -1,13 +1,15 @@
-package com.yamidev.springbootdemo;
+package com.yamidev.springbootdemo.Models;
 
+
+import jakarta.persistence.*;
 
 import java.util.Objects;
 
-//@Entity
-//@Table(name = "users", schema = "public", catalog = "spring")
+@Entity
+@Table(name = "users", schema = "public", catalog = "spring_boot")
 public class User {
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private int id;
     private String username;
     private String email;
