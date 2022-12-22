@@ -25,14 +25,14 @@ public class FirstController {
                 "Hello",
                 "String Boot",
                 List.of("Houssam-Eddine", "Mohammed-Amine", "soumiya"),
-                "AL borto9ala Almora\n"
+                "AL borto9ala Almora"
         );
     }
 
-    record Response(
+     record Response(
             String msg,
             String projectType,
-            List<String> teamP,
+            List<String> team,
             String teamName
     ){}
 
