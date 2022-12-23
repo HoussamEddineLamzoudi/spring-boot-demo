@@ -14,15 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/user")
 public class UserController {
-    private final UserService userService;
-//    UserDto userDto;
-//    UserResponse userResponse;
-
-
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private UserService userService;
 
     @GetMapping
     public List<User> getUsers(){
@@ -36,14 +29,14 @@ public class UserController {
     @PostMapping
     public UserResponse addUser(@RequestBody UserRequest userRequest){
 
+        //object mapping
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(userRequest, userDto);
 
-        UserDto userCreated = userService.save_user(userRequest);
+        UserDto createdUser = userService.save_user(userDto);
 
         UserResponse userResponse = new UserResponse();
-        BeanUtils.copyProperties(userCreated, userResponse);
-
+        BeanUtils.copyProperties(createdUser, userResponse);
         return userResponse;
     }
     @DeleteMapping("{userId}")

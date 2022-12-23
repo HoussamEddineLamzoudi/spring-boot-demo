@@ -2,54 +2,54 @@ package com.yamidev.springbootdemo.Request;
 
 import java.util.Objects;
 
-public final class UserRequest {
-    private final String username;
-    private final String email;
-    private final String password;
+public class UserRequest {
+    private String username;
+    private String email;
+    private String password;
 
-    public UserRequest(
-            String username,
-            String email,
-            String password
-    ) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
+//    public UserRequest(String username, String email, String password) {
+//        this.username = username;
+//        this.email = email;
+//        this.password = password;
+//    }
+
+    public UserRequest() {
     }
 
-    public String username() {
+    public String getUsername() {
         return username;
     }
 
-    public String email() {
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
         return email;
     }
 
-    public String password() {
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (UserRequest) obj;
-        return Objects.equals(this.username, that.username) &&
-                Objects.equals(this.email, that.email) &&
-                Objects.equals(this.password, that.password);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserRequest that)) return false;
+        return Objects.equals(username, that.username) && Objects.equals(email, that.email) && Objects.equals(password, that.password);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(username, email, password);
-    }
-
-    @Override
-    public String toString() {
-        return "UserRequest[" +
-                "username=" + username + ", " +
-                "email=" + email + ", " +
-                "password=" + password + ']';
     }
 }
 

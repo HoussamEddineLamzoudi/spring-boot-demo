@@ -8,10 +8,11 @@ import java.util.Objects;
 @Entity
 @Table(name = "users", schema = "public", catalog = "spring_boot")
 public class User {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String username;
+    @Column(unique = true)
     private String email;
     private String password;
 

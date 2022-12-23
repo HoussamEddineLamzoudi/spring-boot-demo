@@ -6,6 +6,7 @@ import com.yamidev.springbootdemo.Repositorys.UserRepositorys;
 import com.yamidev.springbootdemo.Request.UserRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +14,11 @@ import java.util.List;
 @Service
 @Transactional
 public class UserService {
-
-    private final UserRepositorys userRepositorys;
-    public UserService(UserRepositorys userRepositorys) {
-        this.userRepositorys = userRepositorys;
-    }
+    @Autowired
+    private UserRepositorys userRepositorys;
+//    public UserService(UserRepositorys userRepositorys) {
+//        this.userRepositorys = userRepositorys;
+//    }
 
     public User find_user(Integer userId) {
         return userRepositorys.findById(userId).get();
@@ -25,15 +26,16 @@ public class UserService {
     public List<User> find_all_users() {
         return userRepositorys.findAll();
     }
-    public UserDto save_user(UserRequest userRequest){
-        User user = new User();
-        user.setUsername(userRequest.username());
-        user.setEmail(userRequest.email());
-        user.setPassword(userRequest.password());
-        userRepositorys.save(user);
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        return userDto;
+    public UserDto save_user(UserDto userData){
+        if(userRepositorys.findByEmail(userData.getEmail()) != null) throw new RuntimeException("Deja Deja hhhh");
+        else {
+            User user = new User();
+            BeanUtils.copyProperties(userData, user);
+            User newUser = userRepositorys.save(user);
+            UserDto userDto = new UserDto();
+            BeanUtils.copyProperties(newUser, userDto);
+            return userDto;
+        }
     }
 
     public void remove_user(Integer id) {
@@ -41,9 +43,9 @@ public class UserService {
     }
 
     public void update(User user, UserRequest userRequest) {
-            user.setUsername(userRequest.username());
-            user.setEmail(userRequest.email());
-            user.setPassword(userRequest.password());
+            user.setUsername(userRequest.getUsername());
+            user.setEmail(userRequest.getEmail());
+            user.setPassword(userRequest.getPassword());
             userRepositorys.save(user);
     }
 
