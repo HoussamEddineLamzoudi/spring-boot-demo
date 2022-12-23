@@ -1,18 +1,23 @@
 package com.yamidev.springbootdemo.Controllers;
 
+import com.yamidev.springbootdemo.Dto.UserDto;
 import com.yamidev.springbootdemo.Models.User;
 import com.yamidev.springbootdemo.Request.UserRequest;
+import com.yamidev.springbootdemo.Response.UserResponse;
 import com.yamidev.springbootdemo.Services.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/v1/user")
 public class UserController {
     private final UserService userService;
+//    UserDto userDto;
+//    UserResponse userResponse;
+
 
     @Autowired
     public UserController(UserService userService) {
@@ -29,8 +34,17 @@ public class UserController {
     }
 
     @PostMapping
-    public void addUser(@RequestBody UserRequest userRequest){
-        userService.save_user(userRequest);
+    public UserResponse addUser(@RequestBody UserRequest userRequest){
+
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(userRequest, userDto);
+
+        UserDto userCreated = userService.save_user(userRequest);
+
+        UserResponse userResponse = new UserResponse();
+        BeanUtils.copyProperties(userCreated, userResponse);
+
+        return userResponse;
     }
     @DeleteMapping("{userId}")
     public void deleteUser(@PathVariable("userId") Integer id){
