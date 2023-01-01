@@ -1,29 +1,43 @@
 package com.yamidev.springbootdemo.Config;
 
+import com.yamidev.springbootdemo.Models.User;
+import com.yamidev.springbootdemo.Services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Collections;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAthFilter jwtAthFilter;
+    @Autowired
+    @Lazy
+    private JwtAuthFilter jwtAuthFilter;
+    @Autowired
+    private UserService userService;
 
-    public SecurityConfig(JwtAthFilter jwtAthFilter) {
-        this.jwtAthFilter = jwtAthFilter;
-    }
+//    @Autowired
+//    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+//        this.jwtAuthFilter = jwtAuthFilter;
+//    }
 
 
     @Bean
@@ -31,32 +45,60 @@ public class SecurityConfig {
         httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/**").permitAll()
+                .requestMatchers("/api/v1/auth/**","/hello").permitAll()
                 .anyRequest().authenticated()
-                .and().authenticationProvider(my_authenticationProvider())
-                .addFilterBefore(jwtAthFilter, UsernamePasswordAuthenticationFilter.class);
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(my_authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 
     @Bean
+    AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        System.out.println("ur in authenticationManagerBean now :");
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider my_authenticationProvider() {
+        System.out.println("ur call my_authenticationProvider use your");
+        final DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
     public UserDetailsService userDetailsService() {
+        System.out.println("ur in userDetailsService now :");
         return new UserDetailsService() {
             @Override
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                System.out.println("ur in loadUserByUsername now :");
+                System.out.println("email :"+ email);
+                User user = userService.find_user_by_email(email);
+                if(user!=null){
+                    System.out.println("user found successfully :");
+                    System.out.println(user);
+                    UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                            user.getEmail(),
+                            user.getPassword(),
+                            Collections.singleton(new SimpleGrantedAuthority("Normal_User")));
+                    System.out.println("user deaitils : " + userDetails);
+                    return userDetails;
+                }
                 return null;
             }
         };
     }
 
     @Bean
-    public AuthenticationProvider my_authenticationProvider() {
-        final DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        return daoAuthenticationProvider;
-    }
-    @Bean
     public PasswordEncoder passwordEncoder() {
+        System.out.println("u well use passwordEncoder :");
+        System.out.println(NoOpPasswordEncoder.getInstance());
         return NoOpPasswordEncoder.getInstance();
 //        return new BCryptPasswordEncoder();
     }

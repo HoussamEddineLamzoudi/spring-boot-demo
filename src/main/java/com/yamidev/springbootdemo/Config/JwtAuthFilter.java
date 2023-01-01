@@ -1,10 +1,11 @@
 package com.yamidev.springbootdemo.Config;
 
+import com.yamidev.springbootdemo.Services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.tomcat.util.http.parser.Authorization;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,23 +21,28 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 //@RequiredArgsConstructor
-public class JwtAthFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final UserDetailsService userDetailsService;
-    private final JwtUtils jwtUtils;
+    @Autowired
+    private UserDetailsService userDetailsService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private JwtUtils jwtUtils;
 
-    public JwtAthFilter(UserDetailsService userDetailsService, JwtUtils jwtUtils) {
-        this.userDetailsService = userDetailsService;
-        this.jwtUtils = jwtUtils;
-    }
+//    @Autowired
+//    public JwtAuthFilter(UserDetailsService userDetailsService, JwtUtils jwtUtils) {
+//        this.userDetailsService = userDetailsService;
+//        this.jwtUtils = jwtUtils;
+//    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-//        final String authHeader = request.getHeader(AUTHORIZATION);
-        final String authHeader = request.getHeader("Authorization");
+//        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(AUTHORIZATION);
         final String userEmail;
         final String jwtToken;
 
@@ -47,16 +53,10 @@ public class JwtAthFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7);
         userEmail = jwtUtils.extractUsername(jwtToken);
 
-        // logs
-        System.out.println("///////////////////////////////////////////////////");
-        System.out.println("authHeader :" + authHeader);
-        System.out.println("userEmail :" + userEmail);
-        System.out.println("///////////////////////////////////////////////////");
-
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            final boolean isTokenValid = true;
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+            UserDetails userDetails = (UserDetails) userService.find_user_by_email(userEmail);
             if(jwtUtils.isTokenValid(jwtToken, userDetails))
             {
                 System.out.println("token :");

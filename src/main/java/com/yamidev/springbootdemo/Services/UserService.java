@@ -23,6 +23,10 @@ public class UserService {
     public User find_user(Integer userId) {
         return userRepositorys.findById(userId).get();
     }
+    public User find_user_by_email(String email){
+        System.out.println("ur in user UserService and you'll used find_user_by_email :");
+        return userRepositorys.findByEmail(email);
+    }
     public List<User> find_all_users() {
         return userRepositorys.findAll();
     }
