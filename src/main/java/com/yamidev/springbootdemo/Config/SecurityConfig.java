@@ -92,6 +92,7 @@ public class SecurityConfig {
                             Collections.singleton(new SimpleGrantedAuthority("Normal_User")));
                     System.out.println("user deaitils : " + userDetails);
                     return userDetails;
+                    //spring security hiya li kathandli lina had chi
                 }
                 return null;
             }

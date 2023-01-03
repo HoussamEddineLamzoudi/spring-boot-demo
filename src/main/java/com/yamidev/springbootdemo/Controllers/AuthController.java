@@ -38,6 +38,7 @@ public class AuthController {
     public ResponseEntity<String> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
         System.out.println("---auth controller---");
         System.out.println("apller AuthenticationManager :");
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
         );
@@ -51,9 +52,10 @@ public class AuthController {
                     user.getPassword(),
                     Collections.singleton(new SimpleGrantedAuthority("Normal_User")));
             System.out.println(userDetails);
+
             return ResponseEntity.ok(jwtUtils.generateToken(userDetails));
-//            return ResponseEntity.ok("jwtUtils.generateToken(userDetails)");
         }
+//        return ResponseEntity.ok(jwtUtils.generateToken(userDetails));
         return ResponseEntity.status(400).body("Some error has occurred");
     }
 }
